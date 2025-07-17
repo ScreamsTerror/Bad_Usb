@@ -2,7 +2,7 @@ REM Title: Download And Evade AV
 REM Author: ScreamsTerror
 REM Description: Turns off AV Then Downloads payload 
 REM Target: Windows 
-REM Delete '' And put URL
+REM  'Enter text' line 18
 
 DELAY 100
 GUI r
